@@ -175,6 +175,55 @@ input.addEventListener("keydown", async function (e) {
 });
 
 
+// ===================================================
+// AI 코멘트 생성
+// 교사 버튼을 클릭하면 Vercel 서버리스 함수(/api/gemini)를 호출합니다.
+// ===================================================
+
+const aiBtn = document.getElementById("aiBtn");
+const aiFeedback = document.getElementById("aiFeedback");
+
+if (aiBtn) {
+  aiBtn.addEventListener("click", async function () {
+    const memos = await loadMemos();
+    if (!memos || memos.length === 0) {
+      alert("담벼락에 분석할 메모가 없습니다.");
+      return;
+    }
+
+    aiBtn.disabled = true;
+    aiBtn.textContent = "🤖 AI 총평 작성 중...";
+    aiFeedback.style.display = "block";
+    aiFeedback.textContent = "AI가 작성된 메모들을 읽고 총평을 작성하고 있습니다. 잠시만 기다려 주세요...";
+
+    try {
+      // 식별 정보(uid 등)를 제외하고 오직 메모의 텍스트(text) 배열만 전송합니다.
+      const memoTexts = memos.map(m => m.text);
+
+      const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memos: memoTexts })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Gemini API 오류가 발생했습니다.");
+      }
+
+      aiFeedback.textContent = data.reply;
+    } catch (err) {
+      console.error("AI 코멘트 오류:", err);
+      aiFeedback.textContent = "⚠️ " + (err.message || "AI 코멘트를 가져오는데 실패했습니다.");
+    } finally {
+      aiBtn.disabled = false;
+      aiBtn.textContent = "🤖 AI 담벼락 총평/코멘트 듣기";
+    }
+  });
+}
+
+
 // 첫 화면 그리기
 render();
 input.focus();

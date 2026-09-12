@@ -21,6 +21,12 @@
     #wall { display: flex; flex-wrap: wrap; gap: 10px; }
     .memo { border: 1px solid #ddd; background: #fffde7; padding: 10px; width: 200px; font-size: 15px; }
     .memo button { float: right; }
+    /* AI 코멘트 영역 */
+    #aiArea { margin: 16px 0; }
+    #aiBtn { padding: 8px 16px; background-color: #4A90E2; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+    #aiBtn:hover { background-color: #357ABD; }
+    #aiBtn:disabled { background-color: #ccc; cursor: not-allowed; }
+    #aiFeedback { margin-top: 10px; padding: 12px; background: #eef7ff; border-left: 4px solid #4A90E2; border-radius: 4px; font-size: 15px; line-height: 1.6; white-space: pre-wrap; display: none; }
   </style>
 </head>
 <body>
@@ -31,6 +37,12 @@
 
   <!-- 백엔드 2 시간에 여기에 로그인 버튼과 내 이름이 들어옵니다 -->
   <div id="userArea">로딩 중...</div>
+
+  <!-- AI 피드백 버튼 및 결과 표시 영역 -->
+  <div id="aiArea">
+    <button id="aiBtn">🤖 AI 담벼락 총평/코멘트 듣기</button>
+    <div id="aiFeedback"></div>
+  </div>
 
   <div id="writer">
     <textarea id="input" rows="3" placeholder="메모를 쓰고 엔터"></textarea>
