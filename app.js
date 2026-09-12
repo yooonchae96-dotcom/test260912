@@ -17,6 +17,13 @@ import {
   query, 
   orderBy 
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { 
+  getAuth, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signOut, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -31,6 +38,36 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  updateAuthUI();
+  render(); // 로그인 상태가 바뀌면 지우기 버튼을 다시 그리기 위해 렌더링
+});
+
+function updateAuthUI() {
+  const userArea = document.getElementById("userArea");
+  if (currentUser) {
+    userArea.innerHTML = `
+      <span>로그인 완료 </span>
+      <button id="logoutBtn">로그아웃</button>
+    `;
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth);
+    });
+  } else {
+    userArea.innerHTML = `
+      <button id="loginBtn">구글로 로그인</button>
+    `;
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider);
+    });
+  }
+}
 
 // ===================================================
 // 데이터를 다루는 함수 세 개
@@ -49,8 +86,13 @@ async function loadMemos() {
 // 메모를 새로 씁니다.
 // 백엔드 2: 여기에 "누가 썼는지"(uid)를 함께 저장하게 됩니다.
 async function addMemo(text) {
+  if (!currentUser) {
+    alert("로그인 후 이용해 주세요.");
+    return;
+  }
   await addDoc(collection(db, "memos"), {
     text: text,
+    uid: currentUser.uid,
     createdAt: Date.now()
   });
 }
@@ -81,13 +123,16 @@ function makeMemo(memo) {
   const div = document.createElement("div");
   div.className = "memo";
 
-  const del = document.createElement("button");
-  del.textContent = "×";
-  del.addEventListener("click", async function () {
-    await deleteMemo(memo.id);
-    render();
-  });
-  div.appendChild(del);
+  // 현재 로그인한 사람과 메모 작성자가 같을 때만 × 버튼 표시
+  if (currentUser && currentUser.uid === memo.uid) {
+    const del = document.createElement("button");
+    del.textContent = "×";
+    del.addEventListener("click", async function () {
+      await deleteMemo(memo.id);
+      render();
+    });
+    div.appendChild(del);
+  }
 
   const span = document.createElement("span");
   span.textContent = memo.text;
@@ -109,6 +154,11 @@ input.addEventListener("keydown", async function (e) {
   
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
+
+    if (!currentUser) {
+      alert("로그인 후 이용해 주세요.");
+      return;
+    }
 
     const text = input.value.trim();
     if (text === "") return;
