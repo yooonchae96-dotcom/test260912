@@ -6,7 +6,7 @@
 // 브라우저를 새로고침하면 전부 사라집니다.
 // ===================================================
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
   getFirestore, 
   collection, 
@@ -16,14 +16,14 @@ import {
   doc, 
   query, 
   orderBy 
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { 
   getAuth, 
   signInWithPopup, 
   GoogleAuthProvider, 
   signOut, 
   onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
