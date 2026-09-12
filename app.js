@@ -105,6 +105,8 @@ function makeMemo(memo) {
 const input = document.getElementById("input");
 
 input.addEventListener("keydown", async function (e) {
+  if (e.isComposing || e.keyCode === 229) return;
+  
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
 
