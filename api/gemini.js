@@ -34,9 +34,10 @@ export default async function handler(req, res) {
     const memoTexts = memos.map((m, idx) => `${idx + 1}. ${m}`).join('\n');
     const prompt = `당신은 따뜻하고 격려하는 초등/중등 교사입니다. 아래는 학생들이 학급 담벼락에 작성한 메모들입니다. 이 메모들을 읽고 학급 전체에 대한 따뜻한 종합 피드백(총평)과 격려의 코멘트를 3~4문장 정도로 다정하게 작성해 주세요.\n\n[담벼락 메모 목록]\n${memoTexts}`;
 
-    // Gemini 1.5 Flash 무료 모델 API 호출
+    // Gemini 최신 무료 모델 API 호출 (기본값: gemini-2.0-flash)
+    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
